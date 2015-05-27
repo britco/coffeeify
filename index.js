@@ -53,6 +53,18 @@ function compile(file, data, callback) {
             literate: isLiterate(file)
         });
     } catch (e) {
+        // Passthrough if the file has already been compiled
+        var extname,
+            path = require('path');
+            
+        try {
+          extname = path.extname(convert.fromComment(data).sourcemap.file);
+        } catch(e) {}
+        
+        if(extname === '.coffee') {
+          callback(null, data);
+          return;
+        }
         var error = e;
         if (e.location) {
             error = new ParseError(e, data, file);
